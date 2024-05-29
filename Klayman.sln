@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A806C2B3-2CEB-42A4-96D6-36DF0CFC28E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Klayman.ConsoleApp", "src\Klayman.ConsoleApp\Klayman.ConsoleApp.csproj", "{3FAB4ACD-493A-4FF9-9799-2500B12EF1A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{25FF6A78-1347-4110-ADD4-770B63AB4E4A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{25FF6A78-1347-4110-ADD4-770B63AB4E4A} = {A806C2B3-2CEB-42A4-96D6-36DF0CFC28E0}
+		{3FAB4ACD-493A-4FF9-9799-2500B12EF1A9} = {25FF6A78-1347-4110-ADD4-770B63AB4E4A}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FAB4ACD-493A-4FF9-9799-2500B12EF1A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FAB4ACD-493A-4FF9-9799-2500B12EF1A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FAB4ACD-493A-4FF9-9799-2500B12EF1A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FAB4ACD-493A-4FF9-9799-2500B12EF1A9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
