@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using FluentAssertions;
 using FluentResults.Extensions.FluentAssertions;
 using Klayman.Application;
 using Klayman.Domain;
@@ -11,16 +12,19 @@ namespace Klayman.Infrastructure.Windows.UnitTests;
 public class WindowsKeyboardLayoutManagerTests
 {
     private readonly IWinApiFunctions _winApiFunctions;
+    private readonly IRegistryFunctions _registryFunctions;
     private readonly IKeyboardLayoutFactory _layoutFactory;
     private readonly WindowsKeyboardLayoutManager _layoutManager;
     
     public WindowsKeyboardLayoutManagerTests()
     {
         _winApiFunctions = Substitute.For<IWinApiFunctions>();
+        _registryFunctions = Substitute.For<IRegistryFunctions>();
         _layoutFactory = Substitute.For<IKeyboardLayoutFactory>();
         _layoutManager = new WindowsKeyboardLayoutManager(
-            _winApiFunctions, _layoutFactory);
+            _winApiFunctions, _registryFunctions, _layoutFactory);
     }
+    
     
     [Fact]
     public void GetCurrentKeyboardLayout_GetKeyboardLayoutNameWFails_ReturnsError()
@@ -60,5 +64,28 @@ public class WindowsKeyboardLayoutManagerTests
 
         // Assert
         actualResult.Should().BeSuccess().And.HaveValue(expectedLayout);
+    }
+    
+    
+    [Fact]
+    public void GetAllAvailableKeyboardLayouts_ReturnsKeyboardLayouts()
+    {
+        // Arrange
+        var layoutId = new KeyboardLayoutId("00000000");
+        var layoutIds = new List<KeyboardLayoutId> { layoutId };
+        var layout = new KeyboardLayout(
+            layoutId, string.Empty, null);
+        var expectedLayouts = new List<KeyboardLayout> { layout };
+
+        _registryFunctions.GetPresentKeyboardLayoutIds()
+            .Returns(layoutIds);
+        _layoutFactory.CreateFromKeyboardLayoutId(layoutId)
+            .Returns(layout);
+
+        // Act
+        var actualLayouts = _layoutManager.GetAllAvailableKeyboardLayouts();
+
+        // Assert
+        actualLayouts.Should().BeEquivalentTo(expectedLayouts);
     }
 }

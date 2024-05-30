@@ -22,6 +22,11 @@ public partial class KeyboardLayoutId : IEquatable<KeyboardLayoutId>
         
         _value = layoutId.ToUpperInvariant();
     }
+
+    public KeyboardLayoutId(int layoutId)
+    {
+        _value = layoutId.ToString("X8");
+    }
     
     
     public int GetLanguageId()

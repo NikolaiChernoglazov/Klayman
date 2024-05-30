@@ -28,4 +28,9 @@ public class WinApiFunctions : IWinApiFunctions
             .GetKeyboardLayoutNameW(pwszKLID);
     }
 
+    public int GetKeyboardLayoutList(int nBuff, IntPtr[]? lpList)
+    {
+        return WinApiFunctionImports
+            .GetKeyboardLayoutList(nBuff, lpList);
+    }
 }

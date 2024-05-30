@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 // ReSharper disable InconsistentNaming
 
 namespace Klayman.Infrastructure.Windows.WinApi;
@@ -52,4 +53,23 @@ public interface IWinApiFunctions
     /// <seealso href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getkeyboardlayoutnamew"/>
     bool GetKeyboardLayoutNameW(
         StringBuilder pwszKLID);
+    
+    /// <summary>
+    /// Retrieves the keyboard layout handles (HKLs) corresponding to the current
+    /// set of input locales in the system.
+    /// The function copies the handles to the specified buffer.
+    /// </summary>
+    /// <param name="nBuff">The maximum number of handles that the buffer can hold.</param>
+    /// <param name="lpList">The buffer that receives the array of keyboard layout handles.</param>
+    /// <returns>
+    /// If the function succeeds, the return value is the number of keyboard layout handles copied to the buffer or,
+    /// if nBuff is zero, the return value is the size, in array elements, of the buffer needed to receive all
+    /// current keyboard layout handles.
+    /// If the function fails, the return value is zero.
+    /// To get extended error information, call <see cref="GetLastWin32Error"/>.
+    /// </returns>
+    /// <seealso href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getkeyboardlayoutlist"/>
+    int GetKeyboardLayoutList(
+        int nBuff,
+        [Out] IntPtr[]? lpList);
 }

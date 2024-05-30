@@ -6,7 +6,7 @@ namespace Klayman.Domain.UnitTests;
 public class KeyboardLayoutIdTests
 {
     [Fact]
-    public void Constructor_NotValidKeyboardLayoutId_ThrowsArgumentNullException()
+    public void ConstructorFromString_NotValidKeyboardLayoutId_ThrowsArgumentNullException()
     {
         // Arrange
         var layoutId = "0";
@@ -18,7 +18,7 @@ public class KeyboardLayoutIdTests
     }
     
     [Fact]
-    public void Constructor_ValidKeyboardLayoutId_Passes()
+    public void ConstructorFromString_ValidKeyboardLayoutId_Passes()
     {
         // Arrange
         var layoutId = "00000000";

@@ -36,6 +36,7 @@ IKeyboardLayoutManager CreateKeyboardLayoutManager()
         var registryFunctions = new RegistryFunctions(winApiFunctions);
         return new WindowsKeyboardLayoutManager(
             winApiFunctions,
+            registryFunctions,
             new KeyboardLayoutFactory(
                 new WindowsKeyboardLayoutNameProvider(
                     registryFunctions)));

@@ -8,7 +8,7 @@ namespace Klayman.Infrastructure.Windows.WinApi;
 
 [ExcludeFromCodeCoverage]
 [SupportedOSPlatform("windows")]
-internal static class WinApiFunctionImports
+internal static partial class WinApiFunctionImports
 {
     [DllImport("advapi32.dll",
         CharSet = CharSet.Unicode)]
@@ -26,4 +26,9 @@ internal static class WinApiFunctionImports
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool GetKeyboardLayoutNameW(
         [Out] StringBuilder pwszKLID);
+    
+    [LibraryImport("user32.dll")]
+    public static partial int GetKeyboardLayoutList(
+        int nBuff,
+        [Out] IntPtr[]? lpList);
 }
