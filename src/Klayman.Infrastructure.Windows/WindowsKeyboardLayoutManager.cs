@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security;
+using System.Text;
 using FluentResults;
 using Klayman.Application;
 using Klayman.Domain;
@@ -25,7 +26,7 @@ public class WindowsKeyboardLayoutManager(
         return Result.Ok(layout);
     }
 
-    public Result<IEnumerable<KeyboardLayout>> GetCurrentKeyboardLayoutSet()
+    public Result<List<KeyboardLayout>> GetCurrentKeyboardLayoutSet()
     {
         var layoutsCount = winApiFunctions.GetKeyboardLayoutList(0, null);
         if (layoutsCount == 0)
@@ -41,27 +42,49 @@ public class WindowsKeyboardLayoutManager(
                 nameof(winApiFunctions.GetKeyboardLayoutList)));
         }
 
-        var layouts = layoutHandles
-            .Select(registryFunctions.FindMatchingKeyboardLayoutId)
-            .Select(keyboardLayoutFactory.CreateFromKeyboardLayoutId);
-        return Result.Ok(layouts);
+        try
+        {
+            var layouts = layoutHandles
+                .Select(registryFunctions.FindMatchingKeyboardLayoutId)
+                .Select(keyboardLayoutFactory.CreateFromKeyboardLayoutId)
+                .ToList();
+            return Result.Ok(layouts);
+        }
+        catch (SecurityException)
+        {
+            return Result.Fail(GetRegistryAccessRequiredErrorMessage);
+        }
     }
 
-    public IEnumerable<KeyboardLayout> GetAllAvailableKeyboardLayouts()
+    public Result<List<KeyboardLayout>> GetAllAvailableKeyboardLayouts()
     {
-        return registryFunctions.GetPresentKeyboardLayoutIds()
-            .Select(keyboardLayoutFactory.CreateFromKeyboardLayoutId);
+        try
+        {
+            var layouts = registryFunctions.GetPresentKeyboardLayoutIds()
+                .Select(keyboardLayoutFactory.CreateFromKeyboardLayoutId)
+                .ToList();
+            return Result.Ok(layouts);
+        }
+        catch (SecurityException)
+        {
+            return Result.Fail(GetRegistryAccessRequiredErrorMessage);
+        }
     }
     
-    public IEnumerable<KeyboardLayout> GetAvailableKeyboardLayoutsByQuery(string query)
+    public Result<List<KeyboardLayout>> GetAvailableKeyboardLayoutsByQuery(string query)
     {
-        return GetAllAvailableKeyboardLayouts()
-            .Where(l =>
-                (l.Culture?.Name.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                || l.Name.Contains(query, StringComparison.InvariantCultureIgnoreCase)
-                || l.Id.ToString().Contains(query, StringComparison.InvariantCultureIgnoreCase));
+        return GetAllAvailableKeyboardLayouts().Map(
+            layouts => layouts
+                .Where(l =>
+                    (l.Culture?.Name.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                    || (l.Name?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                    || l.Id.ToString().Contains(query, StringComparison.InvariantCultureIgnoreCase))
+                .ToList());
     }
 
     private string GetWin32FunctionErrorMessage(string functionName)
         => $"Function {functionName} returned an error {winApiFunctions.GetLastWin32Error()}";
+
+    private string GetRegistryAccessRequiredErrorMessage
+        => $"Access to the registry key {registryFunctions.GetKeyboardLayoutRegistryKeyPath()} is required.";
 }

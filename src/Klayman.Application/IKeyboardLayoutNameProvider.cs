@@ -4,5 +4,5 @@ namespace Klayman.Application;
 
 public interface IKeyboardLayoutNameProvider
 {
-    string GetKeyboardLayoutName(KeyboardLayoutId layoutId);
+    string? GetKeyboardLayoutName(KeyboardLayoutId layoutId);
 }

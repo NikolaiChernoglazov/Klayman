@@ -10,11 +10,12 @@ namespace Klayman.Domain;
 /// <param name="Culture">The culture corresponding to the layout.</param>
 public record KeyboardLayout(
     KeyboardLayoutId Id,
-    string Name,
+    string? Name,
     CultureInfo? Culture)
 {
     public override string ToString()
     {
-        return $"{Id} {Culture?.ToString() ?? "     "} {Name}";
+        return $"{Id} {Culture?.ToString() ?? "     "}" +
+               $" {Name ?? Culture?.DisplayName ?? "Unknown"}";
     }
 }

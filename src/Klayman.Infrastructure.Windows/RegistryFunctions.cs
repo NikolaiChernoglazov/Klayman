@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
+using System.Security;
 using System.Text;
 using Klayman.Domain;
 using Klayman.Infrastructure.Windows.Extensions;
@@ -45,18 +46,31 @@ public class RegistryFunctions(
 
         return result == ErrorCode.Success ? output.ToString() : null;
     }
-    
+
+    public string GetKeyboardLayoutRegistryKeyPath()
+    {
+        return KeyboardLayoutsRegistryPath;
+    }
+
     [ExcludeFromCodeCoverage]
-    public string GetLocalizedKeyboardLayoutName(KeyboardLayoutId layoutId)
+    public string? GetLocalizedKeyboardLayoutName(KeyboardLayoutId layoutId)
     {
         // https://learn.microsoft.com/en-us/windows/win32/intl/using-registry-string-redirection#create-resources-for-keyboard-layout-strings
-        using var key = Registry.LocalMachine.OpenSubKey($@"{KeyboardLayoutsRegistryPath}\{layoutId}");
-        if (key == null)
+        try
         {
-            return "Unknown";
+            using var key = Registry.LocalMachine.OpenSubKey($@"{KeyboardLayoutsRegistryPath}\{layoutId}");
+            if (key is null)
+            {
+                return "Unknown";
+            }
+
+            return LoadLocalizedRedirectedString(
+                key.Handle.DangerousGetHandle(), "Layout Display Name");
         }
-        return LoadLocalizedRedirectedString(
-            key.Handle.DangerousGetHandle(), "Layout Display Name") ?? "Unknown";
+        catch (SecurityException)
+        {
+            return null;
+        }
     }
     
     [ExcludeFromCodeCoverage]

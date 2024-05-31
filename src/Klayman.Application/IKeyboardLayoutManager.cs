@@ -14,16 +14,16 @@ public interface IKeyboardLayoutManager
     /// Retrieves the currently used keyboard layout set,
     /// e. g. list of layouts between which the user can switch
     /// </summary>
-    Result<IEnumerable<KeyboardLayout>> GetCurrentKeyboardLayoutSet();
+    Result<List<KeyboardLayout>> GetCurrentKeyboardLayoutSet();
 
     /// <summary>
     /// Retrieves all available keyboard layouts in the OS,
     /// which can be added to the current layout set.
     /// </summary>
-    IEnumerable<KeyboardLayout> GetAllAvailableKeyboardLayouts();
+    Result<List<KeyboardLayout>> GetAllAvailableKeyboardLayouts();
 
     /// <summary>
     /// Retrieves available keyboard layouts in the OS by query
     /// </summary>
-    IEnumerable<KeyboardLayout> GetAvailableKeyboardLayoutsByQuery(string query);
+    Result<List<KeyboardLayout>> GetAvailableKeyboardLayoutsByQuery(string query);
 }

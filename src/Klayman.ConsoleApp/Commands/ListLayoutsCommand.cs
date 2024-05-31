@@ -1,6 +1,8 @@
 ﻿using CommandLine;
+using FluentResults;
 using Klayman.Application;
 using Klayman.ConsoleApp.Extensions;
+using Klayman.Domain;
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -21,27 +23,21 @@ internal class ListLayoutsCommand : ICommand
 
     public void Execute(IKeyboardLayoutManager keyboardLayoutManager)
     {
+        Result<List<KeyboardLayout>> layoutsResult;
         if (ListAllAvailableLayouts)
-        {
-            keyboardLayoutManager.GetAllAvailableKeyboardLayouts()
-                .ToList().ForEach(Console.WriteLine);
-        }
+            layoutsResult = keyboardLayoutManager.GetAllAvailableKeyboardLayouts();
         else if (string.IsNullOrEmpty(Query))
-        {
-            var layoutsResult = keyboardLayoutManager.GetCurrentKeyboardLayoutSet();
-            if (layoutsResult.IsFailed)
-            {
-                Console.WriteLine("ERROR: Could not get keyboard layouts. "
-                                  + layoutsResult.GetCombinedErrorMessage());
-                return;
-            }
-
-            layoutsResult.Value.ToList().ForEach(Console.WriteLine);
-        }
+            layoutsResult = keyboardLayoutManager.GetCurrentKeyboardLayoutSet();
         else
+            layoutsResult = keyboardLayoutManager.GetAvailableKeyboardLayoutsByQuery(Query);
+        
+        if (layoutsResult.IsFailed)
         {
-            keyboardLayoutManager.GetAvailableKeyboardLayoutsByQuery(Query)
-                .ToList().ForEach(Console.WriteLine);
+            Console.WriteLine("ERROR: Could not get keyboard layouts. "
+                              + layoutsResult.GetCombinedErrorMessage());
+            return;
         }
+
+        layoutsResult.Value.ForEach(Console.WriteLine);
     }
 }
