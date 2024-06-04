@@ -31,4 +31,16 @@ internal static partial class WinApiFunctionImports
     public static partial int GetKeyboardLayoutList(
         int nBuff,
         [Out] IntPtr[]? lpList);
+    
+    [LibraryImport("user32.dll",
+        StringMarshalling = StringMarshalling.Utf16)]
+    public static partial IntPtr LoadKeyboardLayoutW(
+        string pwszKLID,
+        uint flags);
+    
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool UnloadKeyboardLayout(
+        IntPtr hkl
+    );
 }

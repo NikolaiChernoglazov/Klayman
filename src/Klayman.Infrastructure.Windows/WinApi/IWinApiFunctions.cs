@@ -72,4 +72,34 @@ public interface IWinApiFunctions
     int GetKeyboardLayoutList(
         int nBuff,
         [Out] IntPtr[]? lpList);
+    
+    /// <summary>
+    /// Loads a new keyboard layout into the system.
+    /// </summary>
+    /// <param name="pwszKLID">The keyboard identifier to load.</param>
+    /// <param name="flags">Specifies how the input locale identifier is to be loaded. </param>
+    /// <returns>
+    /// If the function succeeds, the return value is the input locale identifier.
+    /// If no matching locale is available, the return value is the default language of the system.
+    /// If the function fails, the return value is zero.
+    /// To get extended error information, call <see cref="GetLastWin32Error"/>.
+    /// </returns>
+    /// <seealso href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadkeyboardlayoutw"/>
+    IntPtr LoadKeyboardLayoutW(
+        string pwszKLID,
+        uint flags);
+    
+    /// <summary>
+    /// Unloads a keyboard layout.
+    /// </summary>
+    /// <param name="hkl">A handle of the keyboard layout to be unloaded.</param>
+    /// <returns>
+    /// If the function succeeds, the return value is <see langword="true"/>.
+    /// If the function fails, the return value is <see langword="false"/>.
+    /// To get extended error information, call <see cref="GetLastWin32Error"/>.
+    /// </returns>
+    /// <seealso href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unloadkeyboardlayout"/>
+    bool UnloadKeyboardLayout(
+        IntPtr hkl
+    );
 }

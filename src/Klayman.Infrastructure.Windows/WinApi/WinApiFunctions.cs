@@ -33,4 +33,16 @@ public class WinApiFunctions : IWinApiFunctions
         return WinApiFunctionImports
             .GetKeyboardLayoutList(nBuff, lpList);
     }
+
+    public IntPtr LoadKeyboardLayoutW(string pwszKLID, uint flags)
+    {
+        return WinApiFunctionImports
+            .LoadKeyboardLayoutW(pwszKLID, flags);
+    }
+
+    public bool UnloadKeyboardLayout(IntPtr hkl)
+    {
+        return WinApiFunctionImports
+            .UnloadKeyboardLayout(hkl);
+    }
 }

@@ -37,6 +37,7 @@ IKeyboardLayoutManager CreateKeyboardLayoutManager()
         return new WindowsKeyboardLayoutManager(
             winApiFunctions,
             registryFunctions,
+            new LanguageTagFunctions(),
             new KeyboardLayoutFactory(
                 new WindowsKeyboardLayoutNameProvider(
                     registryFunctions)));
