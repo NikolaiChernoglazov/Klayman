@@ -10,10 +10,9 @@ namespace Klayman.Infrastructure.Windows;
 public class WindowsKeyboardLayoutManager(
     IWinApiFunctions winApiFunctions,
     IRegistryFunctions registryFunctions,
-    ILanguageTagFunctions languageTagFunctions,
     IKeyboardLayoutFactory keyboardLayoutFactory) : IKeyboardLayoutManager
 {
-    public Result<KeyboardLayout> GetCurrentKeyboardLayout()
+    public Result<KeyboardLayout> GetCurrentLayout()
     {
         var layoutIdBuffer = new StringBuilder(KeyboardLayoutId.Length);
         if (!winApiFunctions.GetKeyboardLayoutNameW(layoutIdBuffer))
@@ -27,7 +26,7 @@ public class WindowsKeyboardLayoutManager(
         return Result.Ok(layout);
     }
 
-    public Result<List<KeyboardLayout>> GetCurrentKeyboardLayoutSet()
+    public Result<List<KeyboardLayout>> GetCurrentLayouts()
     {
         try
         {
@@ -42,7 +41,7 @@ public class WindowsKeyboardLayoutManager(
         }
     }
 
-    public Result<List<KeyboardLayout>> GetAllAvailableKeyboardLayouts()
+    public Result<List<KeyboardLayout>> GetAllAvailableLayouts()
     {
         try
         {
@@ -57,18 +56,18 @@ public class WindowsKeyboardLayoutManager(
         }
     }
     
-    public Result<List<KeyboardLayout>> GetAvailableKeyboardLayoutsByQuery(string query)
+    public Result<List<KeyboardLayout>> GetAvailableLayoutsByQuery(string query)
     {
-        return GetAllAvailableKeyboardLayouts().Map(
+        return GetAllAvailableLayouts().Map(
             layouts => layouts
                 .Where(l =>
-                    (l.Culture?.Name.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                    (l.CultureName?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
                     || (l.Name?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
                     || l.Id.ToString().Contains(query, StringComparison.InvariantCultureIgnoreCase))
                 .ToList());
     }
 
-    public Result<KeyboardLayout> AddKeyboardLayoutById(KeyboardLayoutId layoutId)
+    public Result<KeyboardLayout> AddLayout(KeyboardLayoutId layoutId)
     {
         try
         {
@@ -91,15 +90,7 @@ public class WindowsKeyboardLayoutManager(
             : Result.Ok(keyboardLayoutFactory.CreateFromKeyboardLayoutId(layoutId));
     }
 
-    public Result<KeyboardLayout> AddKeyboardLayoutByLanguageTag(string languageTag)
-    {
-        var layoutIdResult = languageTagFunctions.GetMatchingKeyboardLayoutId(languageTag);
-        return layoutIdResult.IsFailed
-            ? layoutIdResult.ToResult<KeyboardLayout>()
-            : AddKeyboardLayoutById(layoutIdResult.Value);
-    }
-
-    public Result<KeyboardLayout> RemoveKeyboardLayoutById(KeyboardLayoutId layoutId)
+    public Result<KeyboardLayout> RemoveLayout(KeyboardLayoutId layoutId)
     {
         var layoutHandlesResult = GetCurrentKeyboardLayoutHandles();
         if (layoutHandlesResult.IsFailed)
@@ -134,14 +125,6 @@ public class WindowsKeyboardLayoutManager(
         {
             return Result.Fail(GetRegistryAccessRequiredErrorMessage());
         }
-    }
-
-    public Result<KeyboardLayout> RemoveKeyboardLayoutByLanguageTag(string languageTag)
-    {
-        var layoutIdResult = languageTagFunctions.GetMatchingKeyboardLayoutId(languageTag);
-        return layoutIdResult.IsFailed
-            ? layoutIdResult.ToResult<KeyboardLayout>()
-            : RemoveKeyboardLayoutById(layoutIdResult.Value);
     }
 
     private Result<IntPtr[]> GetCurrentKeyboardLayoutHandles()

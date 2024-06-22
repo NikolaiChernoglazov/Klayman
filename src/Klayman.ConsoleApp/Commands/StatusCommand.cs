@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using Klayman.Application;
 using Klayman.ConsoleApp.Extensions;
 // ReSharper disable UnusedType.Global
 
@@ -8,9 +7,10 @@ namespace Klayman.ConsoleApp.Commands;
 [Verb("status", HelpText = "Display the current keyboard layout.")]
 internal class StatusCommand : ICommand
 {
-    public void Execute(IKeyboardLayoutManager keyboardLayoutManager)
+    public async Task ExecuteAsync(KlaymanServiceClient klaymanServiceClient)
     {
-        var currentLayoutResult = keyboardLayoutManager.GetCurrentKeyboardLayout();
+        var currentLayoutResult = await klaymanServiceClient.GetCurrentLayoutAsync();
+        
         if (currentLayoutResult.IsFailed)
         {
             Console.WriteLine("ERROR: Could not get current keyboard layout. "

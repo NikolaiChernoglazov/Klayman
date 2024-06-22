@@ -55,7 +55,7 @@ public class KeyboardLayoutIdTests
     public void IsValidKeyboardLayoutId_ValidId_ReturnsTrue(string layoutId)
     {
         // Act
-        var actualValue = KeyboardLayoutId.IsValidKeyboardLayoutId(layoutId);
+        var actualValue = KeyboardLayoutId.IsValid(layoutId);
         
         // Assert
         actualValue.Should().BeTrue();
@@ -69,7 +69,7 @@ public class KeyboardLayoutIdTests
     public void IsValidKeyboardLayoutId_NotValidId_ReturnsFalse(string layoutId)
     {
         // Act
-        var actualValue = KeyboardLayoutId.IsValidKeyboardLayoutId(layoutId);
+        var actualValue = KeyboardLayoutId.IsValid(layoutId);
         
         // Assert
         actualValue.Should().BeFalse();

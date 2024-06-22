@@ -1,8 +1,6 @@
-﻿using Klayman.Application;
-
-namespace Klayman.ConsoleApp.Commands;
+﻿namespace Klayman.ConsoleApp.Commands;
 
 public interface ICommand
 {
-    void Execute(IKeyboardLayoutManager keyboardLayoutManager);
+    Task ExecuteAsync(KlaymanServiceClient klaymanServiceClient);
 }

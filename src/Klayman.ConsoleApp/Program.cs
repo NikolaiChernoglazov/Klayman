@@ -1,47 +1,45 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Reflection;
-using System.Runtime.InteropServices;
 using CommandLine;
-using Klayman.Application;
+using Klayman.ConsoleApp;
 using Klayman.ConsoleApp.Commands;
-using Klayman.Infrastructure.Windows;
-using Klayman.Infrastructure.Windows.WinApi;
-
-var keyboardLayoutManager = CreateKeyboardLayoutManager();
 
 var commandTypes = Assembly.GetExecutingAssembly().GetTypes()
-    .Where(t => t.GetCustomAttribute<VerbAttribute>() != null).ToArray();		 
+    .Where(t => t.GetCustomAttribute<VerbAttribute>() != null).ToArray();
 
-Parser.Default.ParseArguments(args, commandTypes)
-    .WithParsed(command =>
+if (args.Length == 0 || args.First() == "-i")
+{
+    Console.WriteLine("Welcome to the Keyboard Layout Manager.");
+    Console.WriteLine("Type \"help\" to see the list of possible commands.");
+    Console.WriteLine("Type \"exit\" to close the program.");
+    Console.Write("> ");
+    var enteredArgs = Console.ReadLine()?.Split() ?? [];
+    while (enteredArgs.FirstOrDefault() != "exit")
     {
-        try
-        {
-            (command as ICommand)?.Execute(keyboardLayoutManager);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-    });
+        ParseArguments(enteredArgs.ToArray());
+        Console.Write("> ");
+        enteredArgs = Console.ReadLine()?.Split() ?? [];
+    }
+}
+else
+{
+    ParseArguments(args);
+}
 return;
 
-IKeyboardLayoutManager CreateKeyboardLayoutManager()
+void ParseArguments(string[] args)
 {
-    // ReSharper disable once InvertIf
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-    {
-        var winApiFunctions = new WinApiFunctions();
-        var registryFunctions = new RegistryFunctions(winApiFunctions);
-        return new WindowsKeyboardLayoutManager(
-            winApiFunctions,
-            registryFunctions,
-            new LanguageTagFunctions(),
-            new KeyboardLayoutFactory(
-                new WindowsKeyboardLayoutNameProvider(
-                    registryFunctions)));
-    }
-
-    throw new NotSupportedException("The OS platform is not supported yet.");
+    Parser.Default.ParseArguments(args, commandTypes)
+        .WithParsed(command =>
+        {
+            try
+            {
+                (command as ICommand)?.ExecuteAsync(new KlaymanServiceClient()).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        });
 }

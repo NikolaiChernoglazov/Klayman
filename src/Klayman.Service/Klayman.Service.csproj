@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FluentResults.Extensions.AspNetCore" Version="0.1.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Klayman.Application\Klayman.Application.csproj" />
+      <ProjectReference Include="..\Klayman.Infrastructure.Windows\Klayman.Infrastructure.Windows.csproj" />
+    </ItemGroup>
+
+</Project>

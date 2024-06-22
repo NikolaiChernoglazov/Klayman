@@ -16,7 +16,6 @@ public class WindowsKeyboardLayoutManagerTests
 {
     private readonly IWinApiFunctions _winApiFunctions;
     private readonly IRegistryFunctions _registryFunctions;
-    private readonly ILanguageTagFunctions _languageTagFunctions;
     private readonly IKeyboardLayoutFactory _layoutFactory;
     private readonly WindowsKeyboardLayoutManager _layoutManager;
     
@@ -24,15 +23,14 @@ public class WindowsKeyboardLayoutManagerTests
     {
         _winApiFunctions = Substitute.For<IWinApiFunctions>();
         _registryFunctions = Substitute.For<IRegistryFunctions>();
-        _languageTagFunctions = Substitute.For<ILanguageTagFunctions>();
         _layoutFactory = Substitute.For<IKeyboardLayoutFactory>();
         _layoutManager = new WindowsKeyboardLayoutManager(
-            _winApiFunctions, _registryFunctions, _languageTagFunctions, _layoutFactory);
+            _winApiFunctions, _registryFunctions, _layoutFactory);
     }
     
     
     [Fact]
-    public void GetCurrentKeyboardLayout_GetKeyboardLayoutNameWFails_ReturnsError()
+    public void GetCurrentLayout_GetKeyboardLayoutNameWFails_ReturnsError()
     {
         // Arrange
         var errorCode = 1;
@@ -43,14 +41,14 @@ public class WindowsKeyboardLayoutManagerTests
         _winApiFunctions.GetLastWin32Error().Returns(errorCode);
 
         // Act
-        var actualResult = _layoutManager.GetCurrentKeyboardLayout();
+        var actualResult = _layoutManager.GetCurrentLayout();
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
     
     [Fact]
-    public void GetCurrentKeyboardLayout_NoErrors_ReturnsKeyboardLayout()
+    public void GetCurrentLayout_NoErrors_ReturnsKeyboardLayout()
     {
         // Arrange
         var layoutId = new KeyboardLayoutId("00000000");
@@ -65,7 +63,7 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(expectedLayout);
 
         // Act
-        var actualResult = _layoutManager.GetCurrentKeyboardLayout();
+        var actualResult = _layoutManager.GetCurrentLayout();
 
         // Assert
         actualResult.Should().BeSuccess().And.HaveValue(expectedLayout);
@@ -73,7 +71,7 @@ public class WindowsKeyboardLayoutManagerTests
     
     
     [Fact]
-    public void GetCurrentKeyboardLayoutSet_GetKeyboardLayoutListFailsOnGettingLayoutsCount_ReturnsError()
+    public void GetCurrentLayoutSet_GetKeyboardLayoutListFailsOnGettingLayoutsCount_ReturnsError()
     {
         // Arrange
         var errorCode = 1;
@@ -84,14 +82,14 @@ public class WindowsKeyboardLayoutManagerTests
         _winApiFunctions.GetLastWin32Error().Returns(errorCode);
 
         // Act
-        var actualResult = _layoutManager.GetCurrentKeyboardLayoutSet();
+        var actualResult = _layoutManager.GetCurrentLayouts();
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
     
     [Fact]
-    public void GetCurrentKeyboardLayoutSet_GetKeyboardLayoutListFailsOnGettingLayouts_ReturnsError()
+    public void GetCurrentLayoutSet_GetKeyboardLayoutListFailsOnGettingLayouts_ReturnsError()
     {
         // Arrange
         var errorCode = 1;
@@ -105,14 +103,14 @@ public class WindowsKeyboardLayoutManagerTests
         _winApiFunctions.GetLastWin32Error().Returns(errorCode);
 
         // Act
-        var actualResult = _layoutManager.GetCurrentKeyboardLayoutSet();
+        var actualResult = _layoutManager.GetCurrentLayouts();
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
     
     [Fact]
-    public void GetCurrentKeyboardLayoutSet_NoErrors_ReturnsKeyboardLayouts()
+    public void GetCurrentLayoutSet_NoErrors_ReturnsKeyboardLayouts()
     {
         var layoutsCount = 1;
         var layoutHandle = new IntPtr(0);
@@ -132,7 +130,7 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(layout);
 
         // Act
-        var actualResult = _layoutManager.GetCurrentKeyboardLayoutSet();
+        var actualResult = _layoutManager.GetCurrentLayouts();
 
         // Assert
         actualResult.Should().BeSuccess().And
@@ -140,7 +138,7 @@ public class WindowsKeyboardLayoutManagerTests
     }
     
     [Fact]
-    public void GetCurrentKeyboardLayoutSet_RegistryThrowsSecurityException_ReturnsError()
+    public void GetCurrentLayoutSet_RegistryThrowsSecurityException_ReturnsError()
     {
         var layoutsCount = 1;
         var layoutHandle = new IntPtr(0);
@@ -157,7 +155,7 @@ public class WindowsKeyboardLayoutManagerTests
         _registryFunctions.GetKeyboardLayoutRegistryKeyPath().Returns(layoutsKeyPath);
 
         // Act
-        var actualResult = _layoutManager.GetCurrentKeyboardLayoutSet();
+        var actualResult = _layoutManager.GetCurrentLayouts();
 
         // Assert
         actualResult.Should().BeFailure(expectedErrorMessage);
@@ -165,7 +163,7 @@ public class WindowsKeyboardLayoutManagerTests
     
     
     [Fact]
-    public void GetAllAvailableKeyboardLayouts_NoErrors_ReturnsKeyboardLayouts()
+    public void GetAllAvailableLayouts_NoErrors_ReturnsKeyboardLayouts()
     {
         // Arrange
         var layoutId = new KeyboardLayoutId("00000000");
@@ -180,7 +178,7 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(layout);
 
         // Act
-        var actualLayouts = _layoutManager.GetAllAvailableKeyboardLayouts();
+        var actualLayouts = _layoutManager.GetAllAvailableLayouts();
 
         // Assert
         actualLayouts.Should().BeSuccess()
@@ -188,7 +186,7 @@ public class WindowsKeyboardLayoutManagerTests
     }
     
     [Fact]
-    public void GetAllAvailableKeyboardLayouts_RegistryThrowsSecurityException_ReturnsError()
+    public void GetAllAvailableLayouts_RegistryThrowsSecurityException_ReturnsError()
     {
         // Arrange
         var layoutsKeyPath = "Layouts";
@@ -200,7 +198,7 @@ public class WindowsKeyboardLayoutManagerTests
         
 
         // Act
-        var actualLayouts = _layoutManager.GetAllAvailableKeyboardLayouts();
+        var actualLayouts = _layoutManager.GetAllAvailableLayouts();
 
         // Assert
         actualLayouts.Should().BeFailure(expectedErrorMessage);
@@ -208,7 +206,7 @@ public class WindowsKeyboardLayoutManagerTests
 
 
     [Fact]
-    public void AddKeyboardLayoutById_LayoutIdIsNotPresentInRegistry_ReturnsError()
+    public void AddLayout_LayoutIdIsNotPresentInRegistry_ReturnsError()
     {
         // Arrange
         var layoutId = new KeyboardLayoutId("00000000");
@@ -223,14 +221,14 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(layoutsKeyPath);
 
         // Act
-        var actualResult = _layoutManager.AddKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.AddLayout(layoutId);
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
 
     [Fact]
-    public void AddKeyboardLayoutById_RegistryThrowsSecurityException_ReturnsError()
+    public void AddLayout_RegistryThrowsSecurityException_ReturnsError()
     {
         // Arrange
         var layoutId = new KeyboardLayoutId("00000000");
@@ -244,14 +242,14 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(layoutsKeyPath);
 
         // Act
-        var actualResult = _layoutManager.AddKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.AddLayout(layoutId);
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
     
     [Fact]
-    public void AddKeyboardLayoutById_LoadKeyboardLayoutWFails_ReturnsError()
+    public void AddLayout_LoadKeyboardLayoutWFails_ReturnsError()
     {
         // Arrange
         var errorCode = 1;
@@ -265,14 +263,14 @@ public class WindowsKeyboardLayoutManagerTests
         _winApiFunctions.GetLastWin32Error().Returns(errorCode);
 
         // Act
-        var actualResult = _layoutManager.AddKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.AddLayout(layoutId);
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
 
     [Fact]
-    public void AddKeyboardLayoutById_NoErrors_ReturnsKeyboardLayout()
+    public void AddLayout_NoErrors_ReturnsKeyboardLayout()
     {
         // Arrange
         var layoutId = new KeyboardLayoutId("00000001");
@@ -288,7 +286,7 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(expectedLayout);
 
         // Act
-        var actualResult = _layoutManager.AddKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.AddLayout(layoutId);
 
         // Assert
         actualResult.Should().BeSuccess().And.HaveValue(expectedLayout);
@@ -296,107 +294,7 @@ public class WindowsKeyboardLayoutManagerTests
     
     
     [Fact]
-    public void AddKeyboardLayoutByLanguageTag_LayoutIdIsNotPresentInRegistry_ReturnsError()
-    {
-        // Arrange
-        var languageTag = "en";
-        var layoutId = new KeyboardLayoutId("00000000");
-        var layoutsKeyPath = "Layouts";
-        var expectedErrorMessage =
-            $"Keyboard layout with ID {layoutId} is not registered in the OS. It should be present in the " +
-            $"{layoutsKeyPath} Windows Registry path.";
-
-        _languageTagFunctions.GetMatchingKeyboardLayoutId(languageTag)
-            .Returns(Result.Ok(layoutId));
-        _registryFunctions.GetPresentKeyboardLayoutIds()
-            .Returns(new List<KeyboardLayoutId>());
-        _registryFunctions.GetKeyboardLayoutRegistryKeyPath()
-            .Returns(layoutsKeyPath);
-
-        // Act
-        var actualResult = _layoutManager.AddKeyboardLayoutByLanguageTag(languageTag);
-
-        // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
-    }
-
-    [Fact]
-    public void AddKeyboardLayoutByLanguageTag_RegistryThrowsSecurityException_ReturnsError()
-    {
-        // Arrange
-        var languageTag = "en";
-        var layoutId = new KeyboardLayoutId("00000000");
-        var layoutsKeyPath = "Layouts";
-        var expectedErrorMessage =
-            $"Access to the registry key {layoutsKeyPath} is required.";
-
-        _languageTagFunctions.GetMatchingKeyboardLayoutId(languageTag)
-            .Returns(Result.Ok(layoutId));
-        _registryFunctions.GetPresentKeyboardLayoutIds()
-            .Throws<SecurityException>();
-        _registryFunctions.GetKeyboardLayoutRegistryKeyPath()
-            .Returns(layoutsKeyPath);
-
-        // Act
-        var actualResult = _layoutManager.AddKeyboardLayoutByLanguageTag(languageTag);
-
-        // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
-    }
-    
-    [Fact]
-    public void AddKeyboardLayoutByLanguageTag_LoadKeyboardLayoutWFails_ReturnsError()
-    {
-        // Arrange
-        var languageTag = "en";
-        var errorCode = 1;
-        var expectedErrorMessage = $"Function LoadKeyboardLayoutW returned an error {errorCode}";
-        var layoutId = new KeyboardLayoutId("00000000");
-
-        _languageTagFunctions.GetMatchingKeyboardLayoutId(languageTag)
-            .Returns(Result.Ok(layoutId));
-        _registryFunctions.GetPresentKeyboardLayoutIds()
-            .Returns(new List<KeyboardLayoutId> { layoutId });
-        _winApiFunctions.LoadKeyboardLayoutW(layoutId, Arg.Any<uint>())
-            .Returns(IntPtr.Zero);
-        _winApiFunctions.GetLastWin32Error().Returns(errorCode);
-
-        // Act
-        var actualResult = _layoutManager.AddKeyboardLayoutByLanguageTag(languageTag);
-
-        // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
-    }
-
-    [Fact]
-    public void AddKeyboardLayoutByLanguageTag_NoErrors_ReturnsKeyboardLayout()
-    {
-        // Arrange
-        var languageTag = "en";
-        var layoutId = new KeyboardLayoutId("00000001");
-        var layoutHandle = new IntPtr(1);
-        var expectedLayout = new KeyboardLayout(
-            layoutId, string.Empty, null);
-
-        _languageTagFunctions.GetMatchingKeyboardLayoutId(languageTag)
-            .Returns(Result.Ok(layoutId));
-        _registryFunctions.GetPresentKeyboardLayoutIds()
-            .Returns(new List<KeyboardLayoutId> { layoutId });
-        _winApiFunctions.LoadKeyboardLayoutW(layoutId, Arg.Any<uint>())
-            .Returns(layoutHandle);
-        _layoutFactory.CreateFromKeyboardLayoutId(layoutId)
-            .Returns(expectedLayout);
-
-        // Act
-        var actualResult = _layoutManager.AddKeyboardLayoutByLanguageTag(languageTag);
-
-        // Assert
-        actualResult.Should().BeSuccess().And.HaveValue(expectedLayout);
-    }
-    
-    
-    [Fact]
-    public void RemoveKeyboardLayoutById_GetKeyboardLayoutListFailsOnGettingLayoutsCount_ReturnsError()
+    public void RemoveLayout_GetKeyboardLayoutListFailsOnGettingLayoutsCount_ReturnsError()
     {
         // Arrange
         var layoutId = new KeyboardLayoutId("00000000");
@@ -410,14 +308,14 @@ public class WindowsKeyboardLayoutManagerTests
         _winApiFunctions.GetLastWin32Error().Returns(errorCode);
 
         // Act
-        var actualResult = _layoutManager.RemoveKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
     
     [Fact]
-    public void RemoveKeyboardLayoutById_GetKeyboardLayoutListFailsOnGettingLayouts_ReturnsError()
+    public void RemoveLayout_GetKeyboardLayoutListFailsOnGettingLayouts_ReturnsError()
     {
         // Arrange
         var layoutId = new KeyboardLayoutId("00000000");
@@ -434,14 +332,14 @@ public class WindowsKeyboardLayoutManagerTests
         _winApiFunctions.GetLastWin32Error().Returns(errorCode);
 
         // Act
-        var actualResult = _layoutManager.RemoveKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
     
     [Fact]
-    public void RemoveKeyboardLayoutById_LayoutIsNotInCurrentSet_ReturnsError()
+    public void RemoveLayout_LayoutIsNotInCurrentSet_ReturnsError()
     {
         var layoutsCount = 1;
         var layoutHandle = new IntPtr(0);
@@ -458,14 +356,14 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(new KeyboardLayoutId("00000001"));
       
         // Act
-        var actualResult = _layoutManager.RemoveKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
 
     [Fact]
-    public void RemoveKeyboardLayoutById_RegistryThrowsSecurityException_ReturnsError()
+    public void RemoveLayout_RegistryThrowsSecurityException_ReturnsError()
     {
         var layoutsCount = 1;
         var layoutHandle = new IntPtr(0);
@@ -483,14 +381,14 @@ public class WindowsKeyboardLayoutManagerTests
         _registryFunctions.GetKeyboardLayoutRegistryKeyPath().Returns(layoutsKeyPath);
 
         // Act
-        var actualResult = _layoutManager.RemoveKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
         actualResult.Should().BeFailure(expectedErrorMessage);
     }
 
     [Fact]
-    public void RemoveKeyboardLayoutById_UnloadKeyboardLayoutReturnsError_ReturnsError()
+    public void RemoveLayout_UnloadKeyboardLayoutReturnsError_ReturnsError()
     {
         var layoutsCount = 1;
         var layoutHandle = new IntPtr(0);
@@ -510,14 +408,14 @@ public class WindowsKeyboardLayoutManagerTests
         _winApiFunctions.GetLastWin32Error().Returns(errorCode);
       
         // Act
-        var actualResult = _layoutManager.RemoveKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
         actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
     }
     
     [Fact]
-    public void RemoveKeyboardLayoutById_NoErrors_ReturnsKeyboardLayout()
+    public void RemoveLayout_NoErrors_ReturnsKeyboardLayout()
     {
         var layoutsCount = 1;
         var layoutHandle = new IntPtr(0);
@@ -538,7 +436,7 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(expectedLayout);
         
         // Act
-        var actualResult = _layoutManager.RemoveKeyboardLayoutById(layoutId);
+        var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
         actualResult.Should().BeSuccess().And.HaveValue(expectedLayout);

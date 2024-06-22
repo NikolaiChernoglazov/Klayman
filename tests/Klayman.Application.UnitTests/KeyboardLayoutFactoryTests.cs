@@ -25,7 +25,7 @@ public class KeyboardLayoutFactoryTests
         var layoutName = "French";
         var culture = new CultureInfo("fr-FR");
 
-        var expectedKeyboardLayout = new KeyboardLayout(layoutId, layoutName, culture);
+        var expectedKeyboardLayout = new KeyboardLayout(layoutId, layoutName, culture.Name);
         
         _layoutNameProvider.GetKeyboardLayoutName(layoutId).Returns(layoutName);
         

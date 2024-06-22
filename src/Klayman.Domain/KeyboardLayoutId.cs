@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Klayman.Domain;
 
@@ -6,6 +7,7 @@ namespace Klayman.Domain;
 /// Represents a keyboard layout identifier (KLID). It is a string composed of the hexadecimal value
 /// of the Language identifier (low word) and a device identifier (high word).
 /// </summary>
+[JsonConverter(typeof(KeyboardLayoutIdJsonConverter))]
 public partial class KeyboardLayoutId : IEquatable<KeyboardLayoutId>
 {
     /// <summary>
@@ -17,7 +19,7 @@ public partial class KeyboardLayoutId : IEquatable<KeyboardLayoutId>
 
     public KeyboardLayoutId(string layoutId)
     {
-        if (!IsValidKeyboardLayoutId(layoutId))
+        if (!IsValid(layoutId))
             throw new ArgumentException($"{layoutId} is not a valid KLID.");
         
         _value = layoutId.ToUpperInvariant();
@@ -42,7 +44,7 @@ public partial class KeyboardLayoutId : IEquatable<KeyboardLayoutId>
         return layoutId._value;
     }
     
-    public static bool IsValidKeyboardLayoutId(string value)
+    public static bool IsValid(string value)
     {
         return ValidKeyboardLayoutIdRegex().IsMatch(value);
     }

@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using FluentResults;
-using Klayman.Application;
 using Klayman.ConsoleApp.Extensions;
 using Klayman.Domain;
 // ReSharper disable UnusedType.Global
@@ -21,15 +20,15 @@ internal class ListLayoutsCommand : ICommand
         HelpText = "Display available keyboard layouts in the OS that match the query.")]
     public string Query { get; init; } = string.Empty;
 
-    public void Execute(IKeyboardLayoutManager keyboardLayoutManager)
+    public async Task ExecuteAsync(KlaymanServiceClient klaymanServiceClient)
     {
         Result<List<KeyboardLayout>> layoutsResult;
         if (ListAllAvailableLayouts)
-            layoutsResult = keyboardLayoutManager.GetAllAvailableKeyboardLayouts();
+            layoutsResult = await klaymanServiceClient.GetAllAvailableLayoutsAsync();
         else if (string.IsNullOrEmpty(Query))
-            layoutsResult = keyboardLayoutManager.GetCurrentKeyboardLayoutSet();
+            layoutsResult = await klaymanServiceClient.GetCurrentLayoutsAsync();
         else
-            layoutsResult = keyboardLayoutManager.GetAvailableKeyboardLayoutsByQuery(Query);
+            layoutsResult = await klaymanServiceClient.GetAvailableLayoutsByQueryAsync(Query);
         
         if (layoutsResult.IsFailed)
         {

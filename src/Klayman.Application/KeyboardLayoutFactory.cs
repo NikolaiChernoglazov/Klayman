@@ -10,7 +10,7 @@ public class KeyboardLayoutFactory(
     {
         return new KeyboardLayout(layoutId,
             keyboardLayoutNameProvider.GetKeyboardLayoutName(layoutId),
-            GetCultureFromKeyboardLayoutId(layoutId));
+            GetCultureFromKeyboardLayoutId(layoutId)?.Name);
     }
     
     private static CultureInfo? GetCultureFromKeyboardLayoutId(

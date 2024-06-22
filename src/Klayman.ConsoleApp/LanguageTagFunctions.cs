@@ -2,11 +2,11 @@
 using FluentResults;
 using Klayman.Domain;
 
-namespace Klayman.Application;
+namespace Klayman.ConsoleApp;
 
-public class LanguageTagFunctions : ILanguageTagFunctions
+public static class LanguageTagFunctions
 {
-    private readonly Dictionary<string, string>
+    private static readonly Dictionary<string, string>
         _languageTagToLayoutIdMapping = new()
         {
             {"dvorak", "00010409"},
@@ -16,7 +16,7 @@ public class LanguageTagFunctions : ILanguageTagFunctions
             {"uk-ua", "00020422" }
         };
     
-    public Result<KeyboardLayoutId> GetMatchingKeyboardLayoutId(string languageTag)
+    public static Result<KeyboardLayoutId> GetMatchingKeyboardLayoutId(string languageTag)
     {
         if (_languageTagToLayoutIdMapping.TryGetValue(languageTag.ToLowerInvariant(),
                  out var layoutId))
