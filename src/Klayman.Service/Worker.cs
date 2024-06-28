@@ -1,9 +1,39 @@
-﻿namespace Klayman.Service;
+﻿using Klayman.Application.KeyboardLayoutSetManagement;
 
-public class Worker(ILogger<Worker> logger) : BackgroundService
+namespace Klayman.Service;
+
+public class Worker(
+    ILogger<Worker> logger,
+    IKeyboardLayoutSetExporter layoutSetExporter) : BackgroundService
 {
+    public override Task StartAsync(CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Starting service...");
+        
+        var importResult = layoutSetExporter.ImportLayoutSetCacheFromJson();
+        if (importResult.IsFailed)
+        {
+            logger.LogError("Unable to import keyboard layout sets. {error}", importResult.Errors.First().Message);
+        }
+
+        return Task.CompletedTask;
+    }
+    
+    public override Task StopAsync(CancellationToken cancellationToken)
+    {
+        var exportResult = layoutSetExporter.ExportLayoutSetCacheToJson();
+        if (exportResult.IsFailed)
+        {
+            logger.LogError("Unable to export keyboard layout sets. {error}", exportResult.Errors.First().Message);
+        }
+
+        return Task.CompletedTask;
+    }
+    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        logger.LogInformation("Stopping service...");
+        
         while (!stoppingToken.IsCancellationRequested)
         {
             if (logger.IsEnabled(LogLevel.Information))

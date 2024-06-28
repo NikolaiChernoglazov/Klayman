@@ -1,5 +1,5 @@
 ﻿using FluentResults.Extensions.AspNetCore;
-using Klayman.Application;
+using Klayman.Application.KeyboardLayoutManagement;
 using Klayman.Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,7 +37,7 @@ public class KeyboardLayoutsController(
     }
     
     [HttpPost]
-    public ActionResult<KeyboardLayout> AddLayout(KeyboardLayoutId layoutId)
+    public ActionResult<KeyboardLayout> AddLayout(string layoutId)
     {
         if (!KeyboardLayoutId.IsValid(layoutId))
         {
@@ -45,7 +45,7 @@ public class KeyboardLayoutsController(
         }
         
         return keyboardLayoutManager
-            .AddLayout(layoutId).ToActionResult();
+            .AddLayout(new KeyboardLayoutId(layoutId)).ToActionResult();
     }
     
     [HttpDelete]
@@ -58,8 +58,9 @@ public class KeyboardLayoutsController(
             return NotValidKeyboardLayoutId(layoutId);
         }
         
-        return keyboardLayoutManager
-            .RemoveLayout(new KeyboardLayoutId(layoutId)).ToActionResult();
+        var res = keyboardLayoutManager
+            .RemoveLayout(new KeyboardLayoutId(layoutId));
+        return res.ToActionResult();
     }
 
     private BadRequestObjectResult NotValidKeyboardLayoutId(string layoutId)

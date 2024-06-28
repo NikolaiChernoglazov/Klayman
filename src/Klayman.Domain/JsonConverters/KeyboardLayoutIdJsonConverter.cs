@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Klayman.Domain;
+namespace Klayman.Domain.JsonConverters;
 
 public class KeyboardLayoutIdJsonConverter : JsonConverter<KeyboardLayoutId>
 {

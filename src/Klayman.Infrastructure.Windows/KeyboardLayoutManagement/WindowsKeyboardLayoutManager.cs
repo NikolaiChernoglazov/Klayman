@@ -2,10 +2,11 @@
 using System.Text;
 using FluentResults;
 using Klayman.Application;
+using Klayman.Application.KeyboardLayoutManagement;
 using Klayman.Domain;
 using Klayman.Infrastructure.Windows.WinApi;
 
-namespace Klayman.Infrastructure.Windows;
+namespace Klayman.Infrastructure.Windows.KeyboardLayoutManagement;
 
 public class WindowsKeyboardLayoutManager(
     IWinApiFunctions winApiFunctions,
@@ -69,18 +70,10 @@ public class WindowsKeyboardLayoutManager(
 
     public Result<KeyboardLayout> AddLayout(KeyboardLayoutId layoutId)
     {
-        try
+        var canAddLayout = CanAddLayout(layoutId);
+        if (canAddLayout.IsFailed)
         {
-            if (!registryFunctions.GetPresentKeyboardLayoutIds().Contains(layoutId))
-            {
-                return Result.Fail(
-                    $"Keyboard layout with ID {layoutId} is not registered in the OS. It should be present in the " +
-                    $"{registryFunctions.GetKeyboardLayoutRegistryKeyPath()} Windows Registry path.");
-            }
-        }
-        catch (SecurityException)
-        {
-            return Result.Fail(GetRegistryAccessRequiredErrorMessage());
+            return canAddLayout;
         }
 
         var layoutHandle = winApiFunctions.LoadKeyboardLayoutW(layoutId, 0);
@@ -120,6 +113,22 @@ public class WindowsKeyboardLayoutManager(
             }
 
             return Result.Ok(keyboardLayoutFactory.CreateFromKeyboardLayoutId(layoutId));
+        }
+        catch (SecurityException)
+        {
+            return Result.Fail(GetRegistryAccessRequiredErrorMessage());
+        }
+    }
+
+    public Result CanAddLayout(KeyboardLayoutId layoutId)
+    {
+        try
+        {
+            return Result.OkIf(
+                registryFunctions.GetPresentKeyboardLayoutIds().Contains(layoutId),
+                () => new Error(
+                    $"Keyboard layout with ID {layoutId} is not registered in the OS. It should be present in the " +
+                    $"{registryFunctions.GetKeyboardLayoutRegistryKeyPath()} Windows Registry path."));
         }
         catch (SecurityException)
         {

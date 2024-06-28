@@ -14,6 +14,11 @@
     <ItemGroup>
       <ProjectReference Include="..\Klayman.Application\Klayman.Application.csproj" />
       <ProjectReference Include="..\Klayman.Infrastructure.Windows\Klayman.Infrastructure.Windows.csproj" />
+      <ProjectReference Include="..\Klayman.Infrastructure\Klayman.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="keyboardLayoutSets.json" />
     </ItemGroup>
 
 </Project>

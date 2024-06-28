@@ -22,6 +22,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Klayman.Domain.UnitTests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Klayman.Service", "src\Klayman.Service\Klayman.Service.csproj", "{89E3836A-CFB6-4B4F-B18F-840606BA43E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Klayman.Infrastructure", "src\Klayman.Infrastructure\Klayman.Infrastructure.csproj", "{1C8B5D4A-F220-4612-9F15-E230B03A6AE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Klayman.ServiceClient", "src\Klayman.ServiceClient\Klayman.ServiceClient.csproj", "{FCC3E0EC-9E25-479C-99A9-787AF6C883A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +41,8 @@ Global
 		{1A4A3F6A-1305-481B-B00D-822D45452FCD} = {D60C46CF-DFFF-409E-8953-4C09C91F7B3F}
 		{E3EBE6E3-E70A-4B4B-B422-BA88FE29F7BD} = {D60C46CF-DFFF-409E-8953-4C09C91F7B3F}
 		{89E3836A-CFB6-4B4F-B18F-840606BA43E8} = {A806C2B3-2CEB-42A4-96D6-36DF0CFC28E0}
+		{1C8B5D4A-F220-4612-9F15-E230B03A6AE9} = {A806C2B3-2CEB-42A4-96D6-36DF0CFC28E0}
+		{FCC3E0EC-9E25-479C-99A9-787AF6C883A7} = {A806C2B3-2CEB-42A4-96D6-36DF0CFC28E0}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{3FAB4ACD-493A-4FF9-9799-2500B12EF1A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -71,5 +77,13 @@ Global
 		{89E3836A-CFB6-4B4F-B18F-840606BA43E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89E3836A-CFB6-4B4F-B18F-840606BA43E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89E3836A-CFB6-4B4F-B18F-840606BA43E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C8B5D4A-F220-4612-9F15-E230B03A6AE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C8B5D4A-F220-4612-9F15-E230B03A6AE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C8B5D4A-F220-4612-9F15-E230B03A6AE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C8B5D4A-F220-4612-9F15-E230B03A6AE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCC3E0EC-9E25-479C-99A9-787AF6C883A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCC3E0EC-9E25-479C-99A9-787AF6C883A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCC3E0EC-9E25-479C-99A9-787AF6C883A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCC3E0EC-9E25-479C-99A9-787AF6C883A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

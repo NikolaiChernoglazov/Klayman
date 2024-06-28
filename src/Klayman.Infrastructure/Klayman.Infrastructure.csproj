@@ -1,20 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.9.1" />
-      <PackageReference Include="FluentResults" Version="3.15.2" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <ProjectReference Include="..\Klayman.Application\Klayman.Application.csproj" />
       <ProjectReference Include="..\Klayman.Domain\Klayman.Domain.csproj" />
-      <ProjectReference Include="..\Klayman.ServiceClient\Klayman.ServiceClient.csproj" />
     </ItemGroup>
 
 </Project>

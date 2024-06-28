@@ -5,6 +5,7 @@ using FluentResults;
 using FluentResults.Extensions.FluentAssertions;
 using Klayman.Application;
 using Klayman.Domain;
+using Klayman.Infrastructure.Windows.KeyboardLayoutManagement;
 using Klayman.Infrastructure.Windows.WinApi;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;

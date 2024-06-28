@@ -2,8 +2,8 @@
 
 using System.Reflection;
 using CommandLine;
-using Klayman.ConsoleApp;
 using Klayman.ConsoleApp.Commands;
+using Klayman.ServiceClient;
 
 var commandTypes = Assembly.GetExecutingAssembly().GetTypes()
     .Where(t => t.GetCustomAttribute<VerbAttribute>() != null).ToArray();

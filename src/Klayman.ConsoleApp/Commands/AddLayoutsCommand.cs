@@ -24,6 +24,7 @@ internal class AddLayoutsCommand : ICommand
             if (layoutIdResult.IsFailed)
             {
                 Console.WriteLine($"{layoutDescriptor} is not a valid ID or language tag.");
+                return;
             }
 
             var result = await serviceClient.AddLayoutAsync(layoutIdResult.Value);

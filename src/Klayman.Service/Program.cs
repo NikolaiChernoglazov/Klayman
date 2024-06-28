@@ -1,8 +1,12 @@
 using System.Runtime.InteropServices;
 using Klayman.Application;
+using Klayman.Application.KeyboardLayoutManagement;
+using Klayman.Application.KeyboardLayoutSetManagement;
 using Klayman.Service;
-using Klayman.Domain;
+using Klayman.Domain.JsonConverters;
+using Klayman.Infrastructure.KeyboardLayoutSetManagement;
 using Klayman.Infrastructure.Windows;
+using Klayman.Infrastructure.Windows.KeyboardLayoutManagement;
 using Klayman.Infrastructure.Windows.WinApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +24,9 @@ if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 }
 
 services.AddScoped<IKeyboardLayoutFactory, KeyboardLayoutFactory>();
+services.AddScoped<IKeyboardLayoutSetManager, KeyboardLayoutSetManager>();
+services.AddSingleton<IKeyboardLayoutSetCache, KeyboardLayoutSetCache>();
+services.AddSingleton<IKeyboardLayoutSetExporter, KeyboardLayoutSetExporter>();
 
 services.AddControllers()
     .AddJsonOptions(options => {

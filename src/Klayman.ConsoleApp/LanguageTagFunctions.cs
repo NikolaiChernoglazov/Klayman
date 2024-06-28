@@ -27,7 +27,9 @@ public static class LanguageTagFunctions
         try
         {
             var culture = CultureInfo.CreateSpecificCulture(languageTag);
-            return new KeyboardLayoutId(culture.LCID);
+            return culture.LCID == CultureInfo.InvariantCulture.LCID 
+                ? Result.Fail($"Could not find a matching KLID for a language tag {languageTag}.")
+                : Result.Ok(new KeyboardLayoutId(culture.LCID));
         }
         catch (CultureNotFoundException)
         {

@@ -2,7 +2,7 @@
 using FluentResults;
 using Klayman.Domain;
 
-namespace Klayman.ConsoleApp;
+namespace Klayman.ServiceClient;
 
 public class KlaymanServiceClient
 {
@@ -24,11 +24,23 @@ public class KlaymanServiceClient
         => GetAsync<List<KeyboardLayout>>($"layouts/all?query={query}");
 
     public Task<Result<KeyboardLayout>> AddLayoutAsync(KeyboardLayoutId layoutId)
-        => PostAsync<KeyboardLayout, KeyboardLayoutId>("layouts", layoutId);
+        => PostAsync<KeyboardLayoutId, KeyboardLayout>("layouts", layoutId);
 
     public Task<Result<KeyboardLayout>> RemoveLayoutAsync(KeyboardLayoutId layoutId)
         => DeleteAsync<KeyboardLayout>($"layouts/{layoutId}");
     
+    public Task<Result<List<KeyboardLayoutSet>>> GetLayoutSetsAsync()
+        => GetAsync<List<KeyboardLayoutSet>>("layoutSets");
+    
+    public Task<Result<KeyboardLayoutSet>> AddLayoutSetAsync(AddKeyboardLayoutSetRequest request)
+        => PostAsync<AddKeyboardLayoutSetRequest, KeyboardLayoutSet>("layoutSets", request);
+
+    public Task<Result> RemoveLayoutSetAsync(string name)
+        => DeleteAsync($"layoutSets/{name}");
+    
+    public Task<Result> ApplyLayoutSetAsync(string name)
+        => OptionsAsync($"layoutSets/{name}/apply");
+
     
     private async Task<Result<TResponse>> GetAsync<TResponse>(string route)
     {
@@ -49,7 +61,7 @@ public class KlaymanServiceClient
         }
     }
     
-    private async Task<Result<TResponse>> PostAsync<TResponse, TRequest>(string route, TRequest request)
+    private async Task<Result<TResponse>> PostAsync<TRequest, TResponse>(string route, TRequest request)
     {
         try
         {
@@ -81,6 +93,37 @@ public class KlaymanServiceClient
 
             var content = await response.Content.ReadFromJsonAsync<TResponse>();
             return Result.Ok(content!);
+        }
+        catch (Exception e)
+        {
+            return Result.Fail(new ExceptionalError(e));
+        }
+    }
+
+    private async Task<Result> DeleteAsync(string route)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync(route);
+            return !response.IsSuccessStatusCode
+                ? Result.Fail(response.ToString())
+                : Result.Ok();
+        }
+        catch (Exception e)
+        {
+            return Result.Fail(new ExceptionalError(e));
+        }
+    }
+
+    private async Task<Result> OptionsAsync(string route)
+    {
+        try
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Options,route);
+            var response = await _httpClient.SendAsync(requestMessage);
+            return !response.IsSuccessStatusCode
+                ? Result.Fail(response.ToString())
+                : Result.Ok();
         }
         catch (Exception e)
         {

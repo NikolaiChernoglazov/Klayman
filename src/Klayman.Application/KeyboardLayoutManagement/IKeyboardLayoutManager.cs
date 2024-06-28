@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using Klayman.Domain;
 
-namespace Klayman.Application;
+namespace Klayman.Application.KeyboardLayoutManagement;
 
 public interface IKeyboardLayoutManager
 {
@@ -64,4 +64,13 @@ public interface IKeyboardLayoutManager
     /// In case of success the result will contain an removed <see cref="KeyboardLayout"/>.
     /// </returns>
     Result<KeyboardLayout> RemoveLayout(KeyboardLayoutId layoutId);
+
+    /// <summary>
+    /// Checks if a keyboard layout with specified identifier can be added.
+    /// </summary>
+    /// <param name="layoutId"> keyboard layout identifier (KLID)</param>
+    /// <returns>
+    /// A <see cref="Result"/> indicating whether the layout can be added.
+    /// </returns>
+    Result CanAddLayout(KeyboardLayoutId layoutId);
 }
