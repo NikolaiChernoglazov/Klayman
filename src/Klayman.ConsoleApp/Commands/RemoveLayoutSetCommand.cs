@@ -1,5 +1,6 @@
 ﻿using CommandLine;
-using Klayman.ConsoleApp.Extensions;
+using Klayman.ServiceClient;
+
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -18,7 +19,7 @@ public class RemoveLayoutSetCommand : ICommand
         var result = await klaymanServiceClient.RemoveLayoutSetAsync(Name);
         if (result.IsFailed)
         {
-            Console.WriteLine(result.GetCombinedErrorMessage());
+            Console.WriteLine(result.ErrorMessage);
             return;
         }
         

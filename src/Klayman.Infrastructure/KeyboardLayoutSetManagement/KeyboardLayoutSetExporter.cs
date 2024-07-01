@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
-using FluentResults;
 using Klayman.Application.KeyboardLayoutSetManagement;
 using Klayman.Domain;
 using Klayman.Domain.JsonConverters;
+using Klayman.Domain.Results;
 
 namespace Klayman.Infrastructure.KeyboardLayoutSetManagement;
 
@@ -26,7 +26,8 @@ public class KeyboardLayoutSetExporter(
         }
         catch (Exception e)
         {
-            return Result.Fail(new ExceptionalError(e));
+            return Result.Fail(OperationStatusCode.UnknownError,
+                e.Message, e);
         }
     }
 
@@ -47,7 +48,8 @@ public class KeyboardLayoutSetExporter(
         }
         catch (Exception e)
         {
-            return Result.Fail(new ExceptionalError(e));
+            return Result.Fail(OperationStatusCode.UnknownError,
+                e.Message, e);
         }
     }
 }

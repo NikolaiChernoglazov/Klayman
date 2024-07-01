@@ -1,6 +1,6 @@
-﻿using FluentResults;
-using Klayman.Application.KeyboardLayoutManagement;
+﻿using Klayman.Application.KeyboardLayoutManagement;
 using Klayman.Domain;
+using Klayman.Domain.Results;
 
 namespace Klayman.Application.KeyboardLayoutSetManagement;
 
@@ -18,7 +18,7 @@ public class KeyboardLayoutSetManager(
     {
         if (layoutSetCache.Contains(name))
         {
-            return Result.Fail($"Keyboard layout set {name} already exists.");
+            return Result.AlreadyExists($"Keyboard layout set {name} already exists.");
         }
 
         var canApplyLayoutsResult = CanApplyLayouts(layoutIds);
@@ -37,7 +37,7 @@ public class KeyboardLayoutSetManager(
     {
         if (!layoutSetCache.Contains(name))
         {
-            return Result.Fail($"Keyboard layout set {name} does not exist.");
+            return Result.NotFound($"Keyboard layout set {name} does not exist.");
         }
 
         layoutSetCache.Remove(name);
@@ -48,7 +48,7 @@ public class KeyboardLayoutSetManager(
     {
         if (!layoutSetCache.Contains(name))
         {
-            return Result.Fail($"Keyboard layout set {name} does not exist.");
+            return Result.NotFound($"Keyboard layout set {name} does not exist.");
         }
 
         var layoutSet = layoutSetCache.Get(name)!;
@@ -61,22 +61,25 @@ public class KeyboardLayoutSetManager(
         var currentLayoutsResult = keyboardLayoutManager.GetCurrentLayouts();
         if (currentLayoutsResult.IsFailed)
         {
-            return currentLayoutsResult.ToResult();
+            return currentLayoutsResult;
         }
         
-        // Primitive logic for now. Later we can can define intersection with the
-        // current list of keyboard layouts and remove/add only required ones
-        var removalResult = currentLayoutsResult.Value.Skip(1)
-            .Select(l => keyboardLayoutManager.RemoveLayout(l.Id)).Merge();
-        if (removalResult.IsFailed)
+        var failedRemovalResults = currentLayoutsResult.Value.Skip(1)
+            .Select(l => keyboardLayoutManager.RemoveLayout(l.Id))
+            .Where(r => r.IsFailed)
+            .ToList();
+        if (failedRemovalResults.Count > 0)
         {
-            return removalResult.ToResult();
+            return failedRemovalResults.First();
         }
-
-        var addResult = layoutSetCache.Get(name)!.Layouts.Select(
-            l => keyboardLayoutManager.AddLayout(l.Id)).Merge();
-
-        return addResult.ToResult();
+        
+        var failedAddResults = layoutSetCache.Get(name)!.Layouts
+            .Select(l => keyboardLayoutManager.AddLayout(l.Id))
+            .Where(r => r.IsFailed)
+            .ToList();
+        return failedAddResults.Count != 0
+            ? failedAddResults.First()
+            : Result.Ok();
     }
 
     private Result CanApplyLayouts(List<KeyboardLayoutId> layoutIds)

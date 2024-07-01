@@ -1,4 +1,6 @@
-﻿namespace Klayman.ConsoleApp.Commands;
+﻿using Klayman.ServiceClient;
+
+namespace Klayman.ConsoleApp.Commands;
 
 public interface ICommand
 {

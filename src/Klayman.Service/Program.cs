@@ -8,6 +8,7 @@ using Klayman.Infrastructure.KeyboardLayoutSetManagement;
 using Klayman.Infrastructure.Windows;
 using Klayman.Infrastructure.Windows.KeyboardLayoutManagement;
 using Klayman.Infrastructure.Windows.WinApi;
+using Klayman.Service.ResponseBuilding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     services.AddWindowsService();
 }
 
+services.AddScoped<IResponseBuilder, ResponseBuilder>();
 services.AddScoped<IKeyboardLayoutFactory, KeyboardLayoutFactory>();
 services.AddScoped<IKeyboardLayoutSetManager, KeyboardLayoutSetManager>();
 services.AddSingleton<IKeyboardLayoutSetCache, KeyboardLayoutSetCache>();
@@ -33,7 +35,7 @@ services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(
             new KeyboardLayoutIdJsonConverter());
     });
-services.AddHostedService<Worker>(); 
+services.AddHostedService<Worker>();
 
 var app = builder.Build();
 

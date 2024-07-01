@@ -1,5 +1,6 @@
 ﻿using CommandLine;
-using Klayman.ConsoleApp.Extensions;
+using Klayman.ServiceClient;
+
 // ReSharper disable UnusedType.Global
 
 namespace Klayman.ConsoleApp.Commands;
@@ -14,7 +15,7 @@ internal class StatusCommand : ICommand
         if (currentLayoutResult.IsFailed)
         {
             Console.WriteLine("ERROR: Could not get current keyboard layout. "
-                              + currentLayoutResult.GetCombinedErrorMessage());
+                              + currentLayoutResult.ErrorMessage);
             return;
         }
         

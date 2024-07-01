@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Json;
-using FluentResults;
 using Klayman.Domain;
+using Klayman.Domain.Results;
 
 namespace Klayman.ServiceClient;
 
@@ -40,26 +40,64 @@ public class KlaymanServiceClient
     
     public Task<Result> ApplyLayoutSetAsync(string name)
         => OptionsAsync($"layoutSets/{name}/apply");
-
     
-    private async Task<Result<TResponse>> GetAsync<TResponse>(string route)
+
+    private async Task<Result> SendAsync(HttpMethod httpMethod, string route)
     {
         try
         {
-            var response = await _httpClient.GetAsync(route);
+            var requestMessage = new HttpRequestMessage(
+                httpMethod, route);
+            var response = await _httpClient.SendAsync(requestMessage);
+            if (response.IsSuccessStatusCode)
+                return Result.Ok();
+            
+            var errorContent = await response.Content.ReadFromJsonAsync<
+                ErrorResponse>();
+            return Result.Fail(errorContent!.Error);
+
+        }
+        catch (Exception e)
+        {
+            return Result.Fail(e.Message, e);
+        }
+    }
+    
+    private async Task<Result<TResponse>> SendAsync<TResponse>(
+        HttpMethod httpMethod, string route)
+    {
+        try
+        {
+            var requestMessage = new HttpRequestMessage(
+                httpMethod, route);
+            var response = await _httpClient.SendAsync(requestMessage);
             if (!response.IsSuccessStatusCode)
             {
-                return Result.Fail(response.ToString());
+                var errorContent = await response.Content.ReadFromJsonAsync<
+                    ErrorResponse>();
+                return Result.Fail(errorContent!.Error);
             }
-
+            
             var content = await response.Content.ReadFromJsonAsync<TResponse>();
             return Result.Ok(content!);
         }
         catch (Exception e)
         {
-            return Result.Fail(new ExceptionalError(e));
+            return Result.Fail(e.Message, e);
         }
     }
+    
+    private Task<Result<TResponse>> GetAsync<TResponse>(string route)
+        => SendAsync<TResponse>(HttpMethod.Get, route);
+    
+    private Task<Result<TResponse>> DeleteAsync<TResponse>(string route)
+        => SendAsync<TResponse>(HttpMethod.Delete, route);
+    
+    private Task<Result> DeleteAsync(string route)
+        => SendAsync(HttpMethod.Delete, route);
+    
+    private Task<Result> OptionsAsync(string route)
+        => SendAsync(HttpMethod.Options, route);
     
     private async Task<Result<TResponse>> PostAsync<TRequest, TResponse>(string route, TRequest request)
     {
@@ -69,7 +107,9 @@ public class KlaymanServiceClient
                 request);
             if (!response.IsSuccessStatusCode)
             {
-                return Result.Fail(response.ToString());
+                var errorContent = await response.Content.ReadFromJsonAsync<
+                    ErrorResponse>();
+                return Result.Fail(errorContent!.Error);
             }
 
             var content = await response.Content.ReadFromJsonAsync<TResponse>();
@@ -77,57 +117,7 @@ public class KlaymanServiceClient
         }
         catch (Exception e)
         {
-            return Result.Fail(new ExceptionalError(e));
-        }
-    }
-
-    private async Task<Result<TResponse>> DeleteAsync<TResponse>(string route)
-    {
-        try
-        {
-            var response = await _httpClient.DeleteAsync(route);
-            if (!response.IsSuccessStatusCode)
-            {
-                return Result.Fail(response.ToString());
-            }
-
-            var content = await response.Content.ReadFromJsonAsync<TResponse>();
-            return Result.Ok(content!);
-        }
-        catch (Exception e)
-        {
-            return Result.Fail(new ExceptionalError(e));
-        }
-    }
-
-    private async Task<Result> DeleteAsync(string route)
-    {
-        try
-        {
-            var response = await _httpClient.DeleteAsync(route);
-            return !response.IsSuccessStatusCode
-                ? Result.Fail(response.ToString())
-                : Result.Ok();
-        }
-        catch (Exception e)
-        {
-            return Result.Fail(new ExceptionalError(e));
-        }
-    }
-
-    private async Task<Result> OptionsAsync(string route)
-    {
-        try
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Options,route);
-            var response = await _httpClient.SendAsync(requestMessage);
-            return !response.IsSuccessStatusCode
-                ? Result.Fail(response.ToString())
-                : Result.Ok();
-        }
-        catch (Exception e)
-        {
-            return Result.Fail(new ExceptionalError(e));
+            return Result.Fail(e.Message, e);
         }
     }
 }

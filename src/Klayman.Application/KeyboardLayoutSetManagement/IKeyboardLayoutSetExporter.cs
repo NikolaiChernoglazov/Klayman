@@ -1,4 +1,4 @@
-﻿using FluentResults;
+﻿using Klayman.Domain.Results;
 
 namespace Klayman.Application.KeyboardLayoutSetManagement;
 

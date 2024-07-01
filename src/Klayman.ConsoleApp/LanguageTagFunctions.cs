@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
-using FluentResults;
 using Klayman.Domain;
+using Klayman.Domain.Results;
 
 namespace Klayman.ConsoleApp;
 
@@ -21,7 +21,7 @@ public static class LanguageTagFunctions
         if (_languageTagToLayoutIdMapping.TryGetValue(languageTag.ToLowerInvariant(),
                  out var layoutId))
         {
-            return new KeyboardLayoutId(layoutId);
+            return Result.Ok(new KeyboardLayoutId(layoutId));
         }
         
         try

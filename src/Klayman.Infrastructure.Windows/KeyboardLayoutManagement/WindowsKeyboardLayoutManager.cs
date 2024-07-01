@@ -1,9 +1,9 @@
 ﻿using System.Security;
 using System.Text;
-using FluentResults;
 using Klayman.Application;
 using Klayman.Application.KeyboardLayoutManagement;
 using Klayman.Domain;
+using Klayman.Domain.Results;
 using Klayman.Infrastructure.Windows.WinApi;
 
 namespace Klayman.Infrastructure.Windows.KeyboardLayoutManagement;
@@ -18,7 +18,7 @@ public class WindowsKeyboardLayoutManager(
         var layoutIdBuffer = new StringBuilder(KeyboardLayoutId.Length);
         if (!winApiFunctions.GetKeyboardLayoutNameW(layoutIdBuffer))
         {
-            return Result.Fail(GetWin32FunctionErrorMessage(
+            return Result.SystemFunctionFailed(GetWin32FunctionErrorMessage(
                 nameof(winApiFunctions.GetKeyboardLayoutNameW)));
         }
 
@@ -38,7 +38,7 @@ public class WindowsKeyboardLayoutManager(
         }
         catch (SecurityException)
         {
-            return Result.Fail(GetRegistryAccessRequiredErrorMessage());
+            return Result.PermissionRequired(GetRegistryAccessRequiredErrorMessage());
         }
     }
 
@@ -53,7 +53,7 @@ public class WindowsKeyboardLayoutManager(
         }
         catch (SecurityException)
         {
-            return Result.Fail(GetRegistryAccessRequiredErrorMessage());
+            return Result.PermissionRequired(GetRegistryAccessRequiredErrorMessage());
         }
     }
     
@@ -78,7 +78,7 @@ public class WindowsKeyboardLayoutManager(
 
         var layoutHandle = winApiFunctions.LoadKeyboardLayoutW(layoutId, 0);
         return layoutHandle == IntPtr.Zero
-            ? Result.Fail(GetWin32FunctionErrorMessage(
+            ? Result.SystemFunctionFailed(GetWin32FunctionErrorMessage(
                 nameof(winApiFunctions.LoadKeyboardLayoutW)))
             : Result.Ok(keyboardLayoutFactory.CreateFromKeyboardLayoutId(layoutId));
     }
@@ -91,9 +91,8 @@ public class WindowsKeyboardLayoutManager(
             const string explanationMessage =
                 "To remove a keyboard layout, we need to retrieve the " +
                 "current keyboard layout set first. But that operation failed. ";
-            return layoutHandlesResult
-                .MapErrors(e => new Error(explanationMessage + e.Message))
-                .ToResult<KeyboardLayout>();
+            return layoutHandlesResult.WithUpdatedErrorMessage(em =>
+                explanationMessage + em);
         }
 
         try
@@ -103,12 +102,12 @@ public class WindowsKeyboardLayoutManager(
                 h => h);
             if (!layoutIdToHandleMapping.TryGetValue(layoutId, out var handle))
             {
-                return Result.Fail(
-                    $"Keyboard layout with ID {layoutId} is not present in the current keyboard layout set.");
+                return Result.NotFound(
+                    $"Keyboard layout with ID {layoutId} is not present in the current keyboard layout set. ");
             }
             if (!winApiFunctions.UnloadKeyboardLayout(handle))
             {
-                return Result.Fail(GetWin32FunctionErrorMessage(
+                return Result.SystemFunctionFailed(GetWin32FunctionErrorMessage(
                     nameof(winApiFunctions.UnloadKeyboardLayout)));
             }
 
@@ -116,7 +115,7 @@ public class WindowsKeyboardLayoutManager(
         }
         catch (SecurityException)
         {
-            return Result.Fail(GetRegistryAccessRequiredErrorMessage());
+            return Result.PermissionRequired(GetRegistryAccessRequiredErrorMessage());
         }
     }
 
@@ -124,15 +123,14 @@ public class WindowsKeyboardLayoutManager(
     {
         try
         {
-            return Result.OkIf(
-                registryFunctions.GetPresentKeyboardLayoutIds().Contains(layoutId),
-                () => new Error(
-                    $"Keyboard layout with ID {layoutId} is not registered in the OS. It should be present in the " +
-                    $"{registryFunctions.GetKeyboardLayoutRegistryKeyPath()} Windows Registry path."));
+               return registryFunctions.GetPresentKeyboardLayoutIds().Contains(layoutId)
+                   ? Result.Ok()
+                   : Result.NotFound($"Keyboard layout with ID {layoutId} is not registered in the OS. It should be present in the " +
+                                         $"{registryFunctions.GetKeyboardLayoutRegistryKeyPath()} Windows Registry path.");
         }
         catch (SecurityException)
         {
-            return Result.Fail(GetRegistryAccessRequiredErrorMessage());
+            return Result.PermissionRequired(GetRegistryAccessRequiredErrorMessage());
         }
     }
 
@@ -141,14 +139,14 @@ public class WindowsKeyboardLayoutManager(
         var layoutsCount = winApiFunctions.GetKeyboardLayoutList(0, null);
         if (layoutsCount == 0)
         {
-            return Result.Fail(GetWin32FunctionErrorMessage(
+            return Result.SystemFunctionFailed(GetWin32FunctionErrorMessage(
                 nameof(winApiFunctions.GetKeyboardLayoutList)));
         }
 
         var layoutHandles = new IntPtr[layoutsCount];
         if (winApiFunctions.GetKeyboardLayoutList(layoutsCount, layoutHandles) == 0)
         {
-            return Result.Fail(GetWin32FunctionErrorMessage(
+            return Result.SystemFunctionFailed(GetWin32FunctionErrorMessage(
                 nameof(winApiFunctions.GetKeyboardLayoutList)));
         }
 

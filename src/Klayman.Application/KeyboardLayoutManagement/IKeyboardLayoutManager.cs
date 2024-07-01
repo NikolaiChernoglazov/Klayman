@@ -1,5 +1,5 @@
-﻿using FluentResults;
-using Klayman.Domain;
+﻿using Klayman.Domain;
+using Klayman.Domain.Results;
 
 namespace Klayman.Application.KeyboardLayoutManagement;
 

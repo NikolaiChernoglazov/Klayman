@@ -1,6 +1,6 @@
-﻿using FluentResults.Extensions.AspNetCore;
-using Klayman.Application.KeyboardLayoutManagement;
+﻿using Klayman.Application.KeyboardLayoutManagement;
 using Klayman.Domain;
+using Klayman.Service.ResponseBuilding;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Klayman.Service.Controllers;
@@ -8,21 +8,22 @@ namespace Klayman.Service.Controllers;
 [ApiController]
 [Route("layouts")]
 public class KeyboardLayoutsController(
+    IResponseBuilder responseBuilder,
     IKeyboardLayoutManager keyboardLayoutManager) : ControllerBase
 {
     [HttpGet]
     [Route("current")]
     public ActionResult<KeyboardLayout> GetCurrentLayout()
     {
-        return keyboardLayoutManager
-            .GetCurrentLayout().ToActionResult();
+        var result = keyboardLayoutManager.GetCurrentLayout();
+        return responseBuilder.Build(result);
     }
     
     [HttpGet]
     public ActionResult<List<KeyboardLayout>> GetCurrentLayouts()
     {
-        return keyboardLayoutManager
-            .GetCurrentLayouts().ToActionResult();
+        var result = keyboardLayoutManager.GetCurrentLayouts();
+        return responseBuilder.Build(result);
     }
 
     [HttpGet]
@@ -33,7 +34,7 @@ public class KeyboardLayoutsController(
         var result = string.IsNullOrWhiteSpace(query)
             ? keyboardLayoutManager.GetAllAvailableLayouts()
             : keyboardLayoutManager.GetAvailableLayoutsByQuery(query);
-        return result.ToActionResult();
+        return responseBuilder.Build(result);
     }
     
     [HttpPost]
@@ -43,9 +44,10 @@ public class KeyboardLayoutsController(
         {
             return NotValidKeyboardLayoutId(layoutId);
         }
-        
-        return keyboardLayoutManager
-            .AddLayout(new KeyboardLayoutId(layoutId)).ToActionResult();
+
+        var result = keyboardLayoutManager.AddLayout(
+            new KeyboardLayoutId(layoutId));
+        return responseBuilder.Build(result);
     }
     
     [HttpDelete]
@@ -58,9 +60,8 @@ public class KeyboardLayoutsController(
             return NotValidKeyboardLayoutId(layoutId);
         }
         
-        var res = keyboardLayoutManager
-            .RemoveLayout(new KeyboardLayoutId(layoutId));
-        return res.ToActionResult();
+        var result = keyboardLayoutManager.RemoveLayout(new KeyboardLayoutId(layoutId));
+        return responseBuilder.Build(result);
     }
 
     private BadRequestObjectResult NotValidKeyboardLayoutId(string layoutId)

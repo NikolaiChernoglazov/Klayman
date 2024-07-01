@@ -1,8 +1,6 @@
 ﻿using System.Security;
 using System.Text;
 using FluentAssertions;
-using FluentResults;
-using FluentResults.Extensions.FluentAssertions;
 using Klayman.Application;
 using Klayman.Domain;
 using Klayman.Infrastructure.Windows.KeyboardLayoutManagement;
@@ -36,7 +34,7 @@ public class WindowsKeyboardLayoutManagerTests
         // Arrange
         var errorCode = 1;
         var expectedErrorMessage = $"Function GetKeyboardLayoutNameW returned an error {errorCode}";
-
+        
         _winApiFunctions.GetKeyboardLayoutNameW(Arg.Any<StringBuilder>())
             .Returns(false);
         _winApiFunctions.GetLastWin32Error().Returns(errorCode);
@@ -45,7 +43,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.GetCurrentLayout();
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
     
     [Fact]
@@ -67,7 +66,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.GetCurrentLayout();
 
         // Assert
-        actualResult.Should().BeSuccess().And.HaveValue(expectedLayout);
+        actualResult.IsSuccess.Should().BeTrue();
+        actualResult.Value.Should().Be(expectedLayout);
     }
     
     
@@ -86,7 +86,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.GetCurrentLayouts();
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
     
     [Fact]
@@ -107,7 +108,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.GetCurrentLayouts();
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
     
     [Fact]
@@ -134,8 +136,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.GetCurrentLayouts();
 
         // Assert
-        actualResult.Should().BeSuccess().And
-            .Subject.Value.Should().BeEquivalentTo(expectedLayouts);
+        actualResult.IsSuccess.Should().BeTrue();
+        actualResult.Value.Should().BeEquivalentTo(expectedLayouts);
     }
     
     [Fact]
@@ -159,7 +161,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.GetCurrentLayouts();
 
         // Assert
-        actualResult.Should().BeFailure(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
     
     
@@ -179,11 +182,11 @@ public class WindowsKeyboardLayoutManagerTests
             .Returns(layout);
 
         // Act
-        var actualLayouts = _layoutManager.GetAllAvailableLayouts();
+        var actualResult = _layoutManager.GetAllAvailableLayouts();
 
         // Assert
-        actualLayouts.Should().BeSuccess()
-            .And.Subject.Value.Should().BeEquivalentTo(expectedLayouts);
+        actualResult.IsSuccess.Should().BeTrue();
+        actualResult.Value.Should().BeEquivalentTo(expectedLayouts);
     }
     
     [Fact]
@@ -199,10 +202,11 @@ public class WindowsKeyboardLayoutManagerTests
         
 
         // Act
-        var actualLayouts = _layoutManager.GetAllAvailableLayouts();
+        var actualResult = _layoutManager.GetAllAvailableLayouts();
 
         // Assert
-        actualLayouts.Should().BeFailure(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
 
 
@@ -225,7 +229,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.AddLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
 
     [Fact]
@@ -246,7 +251,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.AddLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
     
     [Fact]
@@ -267,7 +273,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.AddLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
 
     [Fact]
@@ -290,7 +297,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.AddLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeSuccess().And.HaveValue(expectedLayout);
+        actualResult.IsSuccess.Should().BeTrue();
+        actualResult.Value.Should().Be(expectedLayout);
     }
     
     
@@ -312,7 +320,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
     
     [Fact]
@@ -336,7 +345,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
     
     [Fact]
@@ -360,7 +370,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
 
     [Fact]
@@ -385,7 +396,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeFailure(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
 
     [Fact]
@@ -412,7 +424,8 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeFailure().And.HaveError(expectedErrorMessage);
+        actualResult.IsFailed.Should().BeTrue();
+        actualResult.ErrorMessage.Should().Be(expectedErrorMessage);
     }
     
     [Fact]
@@ -440,6 +453,7 @@ public class WindowsKeyboardLayoutManagerTests
         var actualResult = _layoutManager.RemoveLayout(layoutId);
 
         // Assert
-        actualResult.Should().BeSuccess().And.HaveValue(expectedLayout);
+        actualResult.IsSuccess.Should().BeTrue();
+        actualResult.Value.Should().Be(expectedLayout);
     }
 }

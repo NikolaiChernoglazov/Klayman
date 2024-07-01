@@ -1,7 +1,8 @@
 ﻿using CommandLine;
-using FluentResults;
-using Klayman.ConsoleApp.Extensions;
 using Klayman.Domain;
+using Klayman.Domain.Results;
+using Klayman.ServiceClient;
+
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -33,7 +34,7 @@ internal class ListLayoutsCommand : ICommand
         if (layoutsResult.IsFailed)
         {
             Console.WriteLine("ERROR: Could not get keyboard layouts. "
-                              + layoutsResult.GetCombinedErrorMessage());
+                              + layoutsResult.ErrorMessage);
             return;
         }
 

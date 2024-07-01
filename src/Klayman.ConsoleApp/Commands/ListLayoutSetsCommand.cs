@@ -1,5 +1,6 @@
 ﻿using CommandLine;
-using Klayman.ConsoleApp.Extensions;
+using Klayman.ServiceClient;
+
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -17,7 +18,7 @@ public class ListLayoutSetsCommand : ICommand
         if (result.IsFailed)
         {
             Console.WriteLine("ERROR: Could not get keyboard layout sets. "
-                              + result.GetCombinedErrorMessage());
+                              + result.ErrorMessage);
             return;
         }
 

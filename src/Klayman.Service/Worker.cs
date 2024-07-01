@@ -13,7 +13,7 @@ public class Worker(
         var importResult = layoutSetExporter.ImportLayoutSetCacheFromJson();
         if (importResult.IsFailed)
         {
-            logger.LogError("Unable to import keyboard layout sets. {error}", importResult.Errors.First().Message);
+            logger.LogError("Unable to import keyboard layout sets. {error}", importResult.ErrorMessage);
         }
 
         return Task.CompletedTask;
@@ -24,7 +24,7 @@ public class Worker(
         var exportResult = layoutSetExporter.ExportLayoutSetCacheToJson();
         if (exportResult.IsFailed)
         {
-            logger.LogError("Unable to export keyboard layout sets. {error}", exportResult.Errors.First().Message);
+            logger.LogError("Unable to export keyboard layout sets. {error}", exportResult.ErrorMessage);
         }
 
         return Task.CompletedTask;

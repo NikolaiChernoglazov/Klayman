@@ -1,5 +1,6 @@
 ﻿using CommandLine;
-using Klayman.ConsoleApp.Extensions;
+using Klayman.ServiceClient;
+
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -30,7 +31,7 @@ internal class RemoveLayoutsCommand : ICommand
             if (result.IsFailed)
             {
                 Console.WriteLine($"ERROR: Failed to remove the layout {layoutDescriptor}. " +
-                                  result.GetCombinedErrorMessage());
+                                  result.ErrorMessage);
                 continue;
             }
             
